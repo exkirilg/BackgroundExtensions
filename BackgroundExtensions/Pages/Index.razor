@@ -1,3 +1,66 @@
 ﻿@page "/"
+@inject IConfiguration config
 
 <PageTitle>Index</PageTitle>
+
+<div class="m-3">
+    <InputFile class="form-control mb-3" accept=".dll" OnChange="HandleFileChange" />
+    <button type="submit" class="btn btn-primary" disabled=@_postDisabled @onclick="HandlePost">Post</button>
+</div>
+
+@code {
+    private List<string> _errors = new();
+
+    private IBrowserFile? _file;
+    private bool _postDisabled => _file is null;
+
+    private readonly int _maxFileSize = 1024 * 1024 * 5;
+    private readonly string[] _extensions = new string[] { ".dll" };
+
+    private string _storeDirectory = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        _storeDirectory = config.GetSection("fs:store").Value!;
+    }
+
+    private void HandleFileChange(InputFileChangeEventArgs e)
+    {
+        _file = null;
+
+        if (FileIsValid(e.File) == false) return;
+
+        _file = e.File;
+    }
+
+    private bool FileIsValid(IBrowserFile file)
+    {
+        _errors.Clear();
+
+        bool result = true;
+
+        if (_extensions.Contains(Path.GetExtension(file.Name)) == false)
+        {
+            result = false;
+            _errors.Add($"File extension must be one of the following: {string.Join(' ', _extensions)}");
+        }
+
+        if (file.Size > _maxFileSize)
+        {
+            result = false;
+            _errors.Add($"File size must not exceed {_maxFileSize} bytes");
+        }
+
+        return result;
+    }
+
+    private async Task HandlePost()
+    {
+        if (_file is null) return;
+
+        string path = Path.Combine(_storeDirectory, $"{Guid.NewGuid().ToString()}.dll");
+
+        await using FileStream fs = new(path, FileMode.Create);
+        await _file.OpenReadStream().CopyToAsync(fs);
+    }
+}
