@@ -1,4 +1,6 @@
+using BackgroundExtensions.BackgroundServices;
 using BackgroundExtensions.DbAccess;
+using BackgroundExtensions.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +8,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddScoped<IDbAccess, DbAccess>();
+
+builder.Services.AddSingleton<IExtensionValidator, ExtensionValidator>();
+
+builder.Services.AddHostedService<StoreManager>();
 
 var app = builder.Build();
 
