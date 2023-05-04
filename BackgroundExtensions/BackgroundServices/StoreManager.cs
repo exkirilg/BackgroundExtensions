@@ -27,10 +27,13 @@ public class StoreManager : BackgroundService
             {
                 FileInfo fi = new(file);
 
+                if (fi.Name.StartsWith(_deprecated)) continue;
+
                 if (_extensionValidator.TryValidateExtensionFile(file, out Extension extension) == false
                     || File.Exists(extension.FileName))
                 {
                     File.Move(fi.FullName, Path.Combine(fi.Directory!.FullName, $"{_deprecated}{fi.Name}"));
+                    continue;
                 }
 
                 using (var scope = _scopeFactory.CreateScope())

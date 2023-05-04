@@ -33,7 +33,7 @@ public class ExtensionValidator : IExtensionValidator
             return false;
         extension.Name = name;
 
-        FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+        FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(file);
         string version = fvi.FileVersion ?? "1.0.0.0";
         extension.Version = version;
 
