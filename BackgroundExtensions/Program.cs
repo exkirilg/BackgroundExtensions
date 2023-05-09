@@ -10,8 +10,10 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<IDbAccess, DbAccess>();
 
 builder.Services.AddSingleton<IExtensionValidator, ExtensionValidator>();
+builder.Services.AddSingleton<IExtensionInvoker, ExtensionInvoker>();
 
 builder.Services.AddHostedService<StoreManager>();
+builder.Services.AddHostedService<ExtensionsManager>();
 
 var app = builder.Build();
 

@@ -16,6 +16,6 @@ public class PostgreSQLScripts
 	";
 
 	public static string GetActualExtensions => @"
-		select max(filename), max(name), max(version) from extensions group by name
+		select max(filename) as FileName, max(name) as Name, max(version) as Version from extensions group by name
 	";
 }

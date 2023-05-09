@@ -6,15 +6,17 @@ namespace BackgroundExtensions.BackgroundServices;
 
 public class StoreManager : BackgroundService
 {
-    private readonly string _storeDirectory;
+    private readonly string _directory;
     private readonly string _deprecated;
+    private readonly int _delay;
     private readonly IExtensionValidator _extensionValidator;
     private readonly IServiceScopeFactory _scopeFactory;
 
     public StoreManager(IConfiguration configuration, IExtensionValidator extensionValidator, IServiceScopeFactory scopeFactory)
     {
-        _storeDirectory = configuration.GetSection("fs:store").Value!;
+        _directory = configuration.GetSection("fs:store").Value!;
         _deprecated = configuration.GetSection("fs:deprecated").Value!;
+        _delay = int.Parse(configuration.GetSection("Managers:StoreManagerDelay").Value!);
         _extensionValidator = extensionValidator;
         _scopeFactory = scopeFactory;
     }
@@ -23,7 +25,7 @@ public class StoreManager : BackgroundService
     {
         while (stoppingToken.IsCancellationRequested == false)
         {
-            foreach (var file in Directory.GetFiles(_storeDirectory))
+            foreach (var file in Directory.GetFiles(_directory))
             {
                 FileInfo fi = new(file);
 
@@ -45,7 +47,7 @@ public class StoreManager : BackgroundService
                 File.Move(fi.FullName, extension.FileName);
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+            await Task.Delay(TimeSpan.FromMinutes(_delay), stoppingToken);
         }
     }
 }

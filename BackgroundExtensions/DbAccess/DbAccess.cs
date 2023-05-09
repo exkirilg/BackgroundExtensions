@@ -29,6 +29,6 @@ public class DbAccess : IDbAccess
     public async Task<IEnumerable<Extension>> GetActualExtensions()
     {
         using IDbConnection connection = new NpgsqlConnection(_connectionString);
-        return await connection.QuerySingleAsync<IEnumerable<Extension>>(PostgreSQLScripts.GetActualExtensions);
+        return await connection.QueryAsync<Extension>(PostgreSQLScripts.GetActualExtensions);
     }
 }
